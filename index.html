@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Grid Calculator">
+    <meta name="apple-mobile-web-app-status-bar-style">
+    <meta name="theme-color" content="#f4f4f4">
+    <title>Grid Calculator</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon.png">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dark.css">
+</head>
+<body>
+    <div class="container">
+        <div class="title-container">
+            <h1>Grid Calculator</h1>
+            <button class="help-icon" aria-label="Show help information">?</button>
+        </div>
+
+        <div id="helpModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Grid Calculator</h2>
+                    <button class="close-modal" aria-label="Close help">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>The grid calculator finds all possible ways to divide a canvas into a uniform grid layout.</p>
+                
+                <h3>User-Configurable Rules:</h3>
+                <ul>
+                    <li>Canvas dimensions (width and height)</li>
+                    <li>Minimum and maximum cell sizes</li>
+                    <li>Whether to allow non-square cells</li>
+                    <li>Desired number of columns and/or rows (optional)</li>
+                    <li>Inner padding range between cells</li>
+                    <li>Outer padding range (optionally different from inner padding)</li>
+                    <li>Baseline grid (ensures cells + inner padding can be subdivided into even baselines)</li>
+                </ul>
+
+                <h3>Subdivisions</h3>
+                <p>For each grid, the calculator shows possible subdivisions for both horizontal (H) and vertical (V) axes. These numbers represent the ways you can evenly divide the grid in each direction:</p>
+                <p>For example, in a 6×4 grid:</p>
+                <ul>
+                    <li>H: 2, 3, 6 means you can group the columns into 2 sections, 3 sections, or keep as 6</li>
+                    <li>V: 2, 4 means you can group the rows into 2 sections or keep as 4</li>
+                </ul>
+                <p>Click on any subdivision value to show guide lines for that grouping - you can have one active horizontal and one active vertical subdivision at a time.</p>
+
+                <h3>Baseline Grid</h3>
+                <p>When baseline grid is enabled, the calculator will only show grids where the cell height and inner padding share common divisors greater than 1. These divisors represent possible baseline values that could be used for typesetting. For example, if a grid has cell height of 120px and inner padding of 30px, possible baseline values would be: 2, 3, 5, 6, 10, 15, 30. Guide lines can be enabled by selecting the desired value in the generated grid</p>
+
+                <h3>Core Grid Requirements:</h3>
+                <ul>
+                    <li>All measurements must be whole pixels (no fractional pixels)</li>
+                    <li>Grid must exactly fill the specified canvas dimensions</li>
+                    <li>Even spacing between all cells (consistent inner padding)</li>
+                    <li>Even spacing around grid edges (consistent outer padding)</li>
+                    <li>Padding cannot exceed the smallest cell dimension</li>
+                    <li>Cell dimensions must be uniform across each axis (all columns same width, all rows same height)</li>
+                    <li>Grid dimensions must satisfy the equation:
+                        <ul>
+                            <li>Width = (columns × cell width) + (inner padding × (columns - 1)) + (2 × outer padding)</li>
+                            <li>Height = (rows × cell height) + (inner padding × (rows - 1)) + (2 × outer padding)</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>Theme</h3>
+                    
+                        <div class="theme-group">
+                            <div class="radio-group">
+                                <input type="radio" id="systemTheme" name="theme" value="system" checked>
+                                <label for="systemTheme">Match system</label>
+                            </div>
+                            <div class="radio-group">
+                                <input type="radio" id="lightTheme" name="theme" value="light">
+                                <label for="lightTheme">Light</label>
+                            </div>
+                            <div class="radio-group">
+                                <input type="radio" id="darkTheme" name="theme" value="dark">
+                                <label for="darkTheme">Dark</label>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="input-section">
+                <h2>Canvas Size</h2>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="width">Width:</label>
+                        <input type="number" id="width" value="1920" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="height">Height:</label>
+                        <input type="number" id="height" value="1080" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <h2>Grid Settings</h2>
+                <div class="input-row">
+                    <div class="input-group">
+                        <input type="checkbox" id="allowNonSquare">
+                        <label for="allowNonSquare">Allow Non-square Grid</label>
+                    </div>
+                </div>
+                <div id="customGridControls" class="custom-controls hidden">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <input type="checkbox" id="useDesiredColumns">
+                            <label for="useDesiredColumns">Specify Columns:</label>
+                            <input type="number" id="desiredColumns" value="" min="1" disabled>
+                        </div>
+                        <div class="input-group">
+                            <input type="checkbox" id="useDesiredRows">
+                            <label for="useDesiredRows">Specify Rows:</label>
+                            <input type="number" id="desiredRows" value="" min="1" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div id="cellSizeControls" class="input-row">
+                    <div class="input-group">
+                        <label for="minCellSize">Min Cell Size:</label>
+                        <input type="number" id="minCellSize" value="100" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="maxCellSize">Max Cell Size:</label>
+                        <input type="number" id="maxCellSize" value="400" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <h2>Padding Settings</h2>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="minInnerPadding">Min Inner Padding:</label>
+                        <input type="number" id="minInnerPadding" value="10" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="maxInnerPadding">Max Inner Padding:</label>
+                        <input type="number" id="maxInnerPadding" value="50" min="0">
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <input type="checkbox" id="useCustomOuterPadding">
+                        <label for="useCustomOuterPadding">Allow Separate Outer Padding</label>
+                    </div>
+                </div>
+                <div class="outer-padding-controls hidden">
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="minOuterPadding">Min Outer Padding:</label>
+                            <input type="number" id="minOuterPadding" value="10" min="0" disabled>
+                        </div>
+                        <div class="input-group">
+                            <label for="maxOuterPadding">Max Outer Padding:</label>
+                            <input type="number" id="maxOuterPadding" value="100" min="0" disabled>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <input type="checkbox" id="outerPaddingGreaterEqual" checked disabled>
+                            <label for="outerPaddingGreaterEqual">Match or Exceed Inner Padding</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <h2>Baseline Settings</h2>
+                <div class="input-row">
+                    <div class="input-group">
+                        <input type="checkbox" id="useBaselineGrid">
+                        <label for="useBaselineGrid">Enable Baseline Grid</label>
+                    </div>
+                </div>
+                <div id="baselineGridControls" class="baseline-controls hidden">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="minBaselineGrid">Min Baseline:</label>
+                            <input type="number" id="minBaselineGrid" value="8" min="2" disabled>
+                        </div>
+                        <div class="input-group">
+                            <label for="maxBaselineGrid">Max Baseline:</label>
+                            <input type="number" id="maxBaselineGrid" value="30" min="2" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="generate">Generate Grids</button>
+            
+        </div>
+        <div id="results-count" class="results-count hidden"></div>
+        <div id="results" class="results-grid"></div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
