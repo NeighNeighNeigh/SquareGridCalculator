@@ -1,0 +1,42 @@
+[data-theme="dark"] {
+    /* Theme variables */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #252525;
+    --text-primary: #e0e0e0;
+    --text-secondary: #d0d0d0;
+    --text-muted: #a0a0a0;
+    --border-color: #404040;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    
+    /* Grid/SVG specific variables */
+    --cell-color: #3d3d3d;
+    --cell-stroke: #4a4a4a;
+    --cell-stroke-width: 0;
+    --baseline-color: #008ec2;
+    /* --subdivision-color: #e600ff; */
+    
+    /* Button variables */
+    --button-primary: #4CAF50;
+    --button-primary-hover: #45a049;
+    --button-view: #0d6efd;
+    --button-view-hover: #0b5ed7;
+    --button-download: #28a745;
+    --button-download-hover: #218838;
+}
+
+/* Dark mode form styles */
+[data-theme="dark"] input[type="number"] {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] input[type="number"]:focus {
+    outline-color: var(--button-view);
+}
+
+/* Dark mode grid/SVG styles */
+[data-theme="dark"] .grid-item svg #Canvas {
+    fill: var(--bg-secondary); /* SVG background */
+}
